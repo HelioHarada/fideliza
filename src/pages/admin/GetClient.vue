@@ -100,8 +100,8 @@ export default {
           if (cameras.length > 0) {
             if (select) {
               console.log(select);
-              self.activeCameraId = cameras[id].id;
-              self.scanner.start(cameras[id]);
+              self.activeCameraId = cameras[select].id;
+              self.scanner.start(cameras[select]);
             } else {
               self.activeCameraId = cameras[0].id;
               self.scanner.start(cameras[0]);

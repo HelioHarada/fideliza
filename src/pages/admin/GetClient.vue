@@ -4,8 +4,13 @@
       <!-- camera -->
       <div class="row justify-center">
         <div class="col-12 col-md-12">
-          <p>Use a camera para ler o QR code:</p>
-          {{message}}
+          <div class="row column justify-center q-pa-sm q-ma-sm">
+            <p>Use a camera para ler o QR code:</p>
+
+            <div v-for="camera in cameras" :key="camera.id">
+              <q-btn color="primary" size="sm" @click="initCamera(camera.index)" :label="camera.name" />
+            </div>
+          </div>
           <video id="camera"></video>
         </div>
       </div>
@@ -43,7 +48,7 @@
 <script>
 import { getClient, postPontos } from "../../api/clientes";
 
-import { Dialog } from 'quasar'
+import { Dialog } from "quasar";
 export default {
   name: "PageIndex",
   data() {
@@ -52,7 +57,7 @@ export default {
       activeCameraId: null,
       cameras: [],
       scans: [],
-      message : "",
+      message: "",
       id: "",
       addpontos: "0",
       expend: false,
@@ -69,7 +74,8 @@ export default {
   methods: {
     getClient,
     postPontos,
-    initCamera() {
+
+    initCamera(select) {
       var self = this;
       self.scanner = new Instascan.Scanner({
         video: document.getElementById("camera"),
@@ -88,16 +94,22 @@ export default {
         .then(function(cameras) {
           self.cameras = cameras;
           if (cameras.length > 0) {
-            self.activeCameraId = cameras[0].id;
-            self.scanner.start(cameras[0]);
+            if (select) {
+              console.log(select)
+              self.activeCameraId = cameras[id].id;
+              self.scanner.start(cameras[id]);
+            } else {
+              self.activeCameraId = cameras[0].id;
+              self.scanner.start(cameras[0]);
+            }
+
           } else {
-            self.message = "camera não encontrada";
-            alert("camera não encontrada")
+            alert("camera não encontrada");
             console.error("No cameras found.");
           }
         })
         .catch(function(e) {
-          alert(e)
+          alert(e);
           console.error(e);
         });
     },
@@ -112,29 +124,37 @@ export default {
       }
     },
 
-    confirm () {
-
-      const total = parseInt(this.cliente.pontos) + parseInt(this.addpontos)
-      this.$q.dialog({
-        title: 'Confirmar pontuação',
-        message: 'Você está adicionando ' + this.addpontos + " No total o cliente "+this.cliente.nome +" ficara com : "+ total,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        console.log("add")
-        this.adicionarPontos(this.cliente.id, total);
-      }).onCancel(() => {
-        // console.log('>>>> Cancel')
-      })
+    confirm() {
+      const total = parseInt(this.cliente.pontos) + parseInt(this.addpontos);
+      this.$q
+        .dialog({
+          title: "Confirmar pontuação",
+          message:
+            "Você está adicionando " +
+            this.addpontos +
+            " No total o cliente " +
+            this.cliente.nome +
+            " ficara com : " +
+            total,
+          cancel: true,
+          persistent: true
+        })
+        .onOk(() => {
+          console.log("add");
+          this.adicionarPontos(this.cliente.id, total);
+        })
+        .onCancel(() => {
+          // console.log('>>>> Cancel')
+        });
     },
 
-    async adicionarPontos(id, ponto){
+    async adicionarPontos(id, ponto) {
       try {
-        const res = await this.postPontos(id, ponto)
+        const res = await this.postPontos(id, ponto);
         this.showClient(id);
         console.log(res);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     }
     // selectCamera: function (camera) {

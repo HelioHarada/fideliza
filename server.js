@@ -1,7 +1,7 @@
 
 // importa configuração do Express e do banco de dados
 var express = require('express');
-var path = require('path');
+// var path = require('path');
 var serveStatic = require('serve-static');
 history = require('connect-history-api-fallback'),
 

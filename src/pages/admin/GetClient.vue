@@ -7,8 +7,8 @@
           <div class="row column justify-center q-pa-sm q-ma-sm">
             <p>Use a camera para ler o QR code:</p>
 
-            <div v-for="camera in cameras" :key="camera.id">
-              <q-btn color="primary" size="sm" @click="initCamera(camera.index)" :label="camera.name" />
+            <div v-for="(camera , index ) in cameras" :key="camera.id">
+              <q-btn color="primary" size="sm" @click="initCamera(index)" :label="camera.name" />
             </div>
           </div>
           <video id="camera"></video>
@@ -77,17 +77,21 @@ export default {
 
     initCamera(select) {
       var self = this;
-      self.scanner = new Instascan.Scanner({
-        video: document.getElementById("camera"),
-        scanPeriod: 5
-      });
 
-      // Ler e exibir
-      self.scanner.addListener("scan", function(content, image) {
-        console.log(content);
-        self.id = content;
-        self.showClient(content);
-      });
+      if (!self.scanner) {
+        console.log("criar instancia")
+        self.scanner = new Instascan.Scanner({
+          video: document.getElementById("camera"),
+          scanPeriod: 5
+        });
+
+        // Ler e exibir
+        self.scanner.addListener("scan", function(content, image) {
+          console.log(content);
+          self.id = content;
+          self.showClient(content);
+        });
+      }
 
       // Pegar cameras para execução
       Instascan.Camera.getCameras()
@@ -95,14 +99,13 @@ export default {
           self.cameras = cameras;
           if (cameras.length > 0) {
             if (select) {
-              console.log(select)
+              console.log(select);
               self.activeCameraId = cameras[id].id;
               self.scanner.start(cameras[id]);
             } else {
               self.activeCameraId = cameras[0].id;
               self.scanner.start(cameras[0]);
             }
-
           } else {
             alert("camera não encontrada");
             console.error("No cameras found.");
